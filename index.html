@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Formulir Pendaftaran Carnival Big Sale Suryatokoku</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  * { box-sizing: border-box; }
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #ff9acb, #ffc1dd);
+  padding: 20px;
+}
+
+.box {
+  max-width: 650px;
+  background: #ffffff;
+  margin: auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0,0,0,.18);
+}
+
+.header {
+  text-align: center;
+  padding: 6px 10px;
+  background: #ffe3f0;
+}
+
+.header .banner {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  display: inline-block;
+}
+
+.content { padding: 22px; }
+
+h2 {
+  text-align: center;
+  color: #e91e63;
+  margin-bottom: 22px;
+  font-size: 18px;
+}
+
+
+label {
+  font-weight: bold;
+  margin-top: 14px;
+  display: block;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 11px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+textarea { resize: vertical; }
+
+.desc {
+  font-size: 13px;
+  background: #fff0f7;
+  padding: 14px;
+  border-radius: 8px;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+button {
+  width: 100%;
+  background: #e91e63;
+  color: #fff;
+  border: none;
+  padding: 15px;
+  margin-top: 26px;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+button:hover { background: #d81b60; }
+
+.loading {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,.92);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1.5;
+  color: #e91e63;
+  z-index: 999;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="loading" id="loading">
+  ⏳ Mengirim data & menyiapkan WhatsApp...<br><br>
+  Mohon kirim pesan WhatsApp yang akan terbuka
+  untuk menyelesaikan proses pendaftaran 😊
+</div>
+
+<div class="box">
+  <div class="header">
+    <img src="Logo CBSS Vol.2.png" class="banner">
+  </div>
+
+  <div class="content">
+    <p class="event-desc">
+  <b>Carnival Big Sale Suryatokoku</b> hadir dengan segudang
+  <b>Promo Spesial</b>, <b>Diskon Besar</b>, <b>Free Produk di jam tertentu</b>,
+  <b>Games Berhadiah</b>, dan berbagai <b>Activity Seru</b> yang sayang untuk dilewatkan!
+</p>
+
+<h2>FORMULIR PENDAFTARAN</h2>
+
+    <form id="regForm">
+
+      <label>Nama Lengkap</label>
+      <input type="text" name="nama" required>
+
+      <label>Jenis Kelamin</label>
+      <select name="jk" required>
+        <option value="">-- Pilih --</option>
+        <option>Laki-laki</option>
+        <option>Perempuan</option>
+      </select>
+
+      <label>Tanggal Lahir</label>
+
+<div style="display:flex; gap:8px;">
+  <select id="tgl" required>
+    <option value="">Tanggal</option>
+  </select>
+
+  <select id="bln" required>
+    <option value="">Bulan</option>
+  </select>
+
+  <select id="thn" required>
+    <option value="">Tahun</option>
+  </select>
+</div>
+
+<input type="hidden" name="tgl_lahir" id="tgl_lahir">
+
+      <label>Nomor WhatsApp</label>
+      <input type="tel" name="wa" required placeholder="0838777xxxxx">
+
+      <label>Provinsi</label>
+<select id="provinsi" name="provinsi" required>
+  <option value="">Memuat...</option>
+</select>
+
+<label>Kabupaten/Kota</label>
+<select id="kabupaten" name="kabupaten" required disabled>
+  <option value="">Pilih Provinsi</option>
+</select>
+
+<label>Kecamatan</label>
+<select id="kecamatan" name="kecamatan" required disabled>
+  <option value="">Pilih Kabupaten</option>
+</select>
+
+<label>Desa/Kelurahan</label>
+<select id="desa" name="desa" required disabled>
+  <option value="">Pilih Kecamatan</option>
+</select>
+
+
+      <button type="submit">DAFTAR</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const form = document.getElementById("regForm");
+const loading = document.getElementById("loading");
+
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbx4u-4J53Dig28cstEE-eT6WuzKX5_4MLr7-n681GOfBRTQPD3UOlwjZ56UH_2OUis/exec";
+const SUCCESS_URL = "https://suryatokoku.my.id/form-cbss/sukses.html";
+
+form.addEventListener("submit", function(e) {
+  e.preventDefault();
+  loading.style.display = "flex";
+
+  fetch(WEBAPP_URL, {
+    method: "POST",
+    body: new FormData(form)
+  })
+  .then(r => r.text())
+  .then(t => {
+  if (t.trim() === "OK") {
+
+    const nama = form.nama.value;
+const wa = form.wa.value;
+const jk = form.jk.value;
+
+// hitung usia
+const tglLahir = new Date(form.tgl_lahir.value);
+const hariIni = new Date();
+
+let usia = hariIni.getFullYear() - tglLahir.getFullYear();
+
+const bulan = hariIni.getMonth() - tglLahir.getMonth();
+
+if (
+  bulan < 0 ||
+  (bulan === 0 && hariIni.getDate() < tglLahir.getDate())
+){
+  usia--;
+}
+
+    const successLink =
+      SUCCESS_URL +
+      "?nama=" + encodeURIComponent(nama) +
+      "&wa=" + encodeURIComponent(wa);
+
+    const pesan =
+`Halo min 😊 Saya sudah daftar di Carnival Big Sale Suryatokoku Vol.2 ya.
+
+👤 Nama : ${nama}
+🚻 Jenis Kelamin : ${jk}
+🎂 Usia : ${usia} Tahun
+
+Berikut bukti pendaftaran saya:
+
+${successLink}`;
+
+    // redirect saat user kembali ke browser
+    function kembaliKeSukses() {
+      if (!document.hidden) {
+        document.removeEventListener(
+          "visibilitychange",
+          kembaliKeSukses
+        );
+
+        window.location.href = successLink;
+      }
+    }
+
+    document.addEventListener(
+      "visibilitychange",
+      kembaliKeSukses
+    );
+
+    // buka WA di tab yang sama
+    setTimeout(() => {
+
+  window.location.href =
+  "https://wa.me/628131310110?text=" +
+  encodeURIComponent(pesan);
+
+}, 2000);
+
+  } else {
+    throw t;
+  }
+})
+  .catch(err => {
+    alert("Gagal mengirim data");
+    loading.style.display = "none";
+    console.error(err);
+  });
+});
+
+</script>
+
+<script>
+const provinsi = document.getElementById("provinsi");
+const kabupaten = document.getElementById("kabupaten");
+const kecamatan = document.getElementById("kecamatan");
+const desa = document.getElementById("desa");
+
+const API = "https://www.emsifa.com/api-wilayah-indonesia/api";
+
+async function loadProvinsi() {
+  const res = await fetch(`${API}/provinces.json`);
+  const data = await res.json();
+
+  provinsi.innerHTML = '<option value="">-- Pilih Provinsi --</option>';
+
+  data.forEach(item=>{
+    provinsi.innerHTML +=
+      `<option value="${item.name}" data-id="${item.id}">
+        ${item.name}
+      </option>`;
+  });
+}
+
+provinsi.addEventListener("change", async ()=>{
+
+  kabupaten.disabled = false;
+  kecamatan.disabled = true;
+  desa.disabled = true;
+
+  const id = provinsi.selectedOptions[0].dataset.id;
+
+  const res = await fetch(`${API}/regencies/${id}.json`);
+  const data = await res.json();
+
+  kabupaten.innerHTML =
+  '<option value="">-- Pilih Kabupaten/Kota --</option>';
+
+  data.forEach(item=>{
+    kabupaten.innerHTML +=
+      `<option value="${item.name}" data-id="${item.id}">
+      ${item.name}
+      </option>`;
+  });
+
+});
+
+kabupaten.addEventListener("change", async ()=>{
+
+  kecamatan.disabled=false;
+
+  const id=kabupaten.selectedOptions[0].dataset.id;
+
+  const res=await fetch(`${API}/districts/${id}.json`);
+  const data=await res.json();
+
+  kecamatan.innerHTML=
+  '<option value="">-- Pilih Kecamatan --</option>';
+
+  data.forEach(item=>{
+      kecamatan.innerHTML +=
+      `<option value="${item.name}" data-id="${item.id}">
+      ${item.name}
+      </option>`;
+  });
+
+});
+
+kecamatan.addEventListener("change", async ()=>{
+
+  desa.disabled=false;
+
+  const id=kecamatan.selectedOptions[0].dataset.id;
+
+  const res=await fetch(`${API}/villages/${id}.json`);
+  const data=await res.json();
+
+  desa.innerHTML=
+  '<option value="">-- Pilih Desa/Kelurahan --</option>';
+
+  data.forEach(item=>{
+      desa.innerHTML +=
+      `<option value="${item.name}">
+      ${item.name}
+      </option>`;
+  });
+
+});
+
+loadProvinsi();
+</script>
+
+<script>
+const tgl = document.getElementById("tgl");
+const bln = document.getElementById("bln");
+const thn = document.getElementById("thn");
+const tglLahir = document.getElementById("tgl_lahir");
+
+// isi tanggal
+for(let i=1;i<=31;i++){
+  tgl.innerHTML += `<option value="${i}">${i}</option>`;
+}
+
+// isi bulan
+const bulan = [
+"Januari","Februari","Maret","April","Mei","Juni",
+"Juli","Agustus","September","Oktober","November","Desember"
+];
+
+bulan.forEach((b,i)=>{
+  bln.innerHTML +=
+  `<option value="${String(i+1).padStart(2,"0")}">${b}</option>`;
+});
+
+// isi tahun (2026 mundur sampai 1950)
+for(let i=new Date().getFullYear();i>=1950;i--){
+  thn.innerHTML += `<option value="${i}">${i}</option>`;
+}
+
+// gabungkan ke format yyyy-mm-dd
+function updateTanggal(){
+  if(tgl.value && bln.value && thn.value){
+    tglLahir.value =
+    `${thn.value}-${bln.value}-${String(tgl.value).padStart(2,"0")}`;
+  }
+}
+
+tgl.addEventListener("change",updateTanggal);
+bln.addEventListener("change",updateTanggal);
+thn.addEventListener("change",updateTanggal);
+</script> 
+ 
+</body>
+</html>
