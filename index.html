@@ -415,6 +415,33 @@
     </div>
   </div>
 
+  <!-- Staff Password Authentication Modal -->
+  <div class="overlay" id="staffAuthModal">
+    <div class="popup-box">
+      <div style="font-size: 32px; margin-bottom: 6px;">🔐</div>
+      <h3 style="font-family:'Outfit', sans-serif; color:var(--primary); margin-bottom: 6px; font-size: 20px;">Akses Petugas ✨</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">
+        Masukkan kata sandi khusus staf untuk membuka scanner tiket
+      </p>
+
+      <div style="text-align: left; margin-bottom: 12px;">
+        <input type="password" id="staffPassInput" placeholder="Masukkan password..." style="text-align: center; letter-spacing: 2px; font-size: 16px;" onkeydown="if(event.key==='Enter') verifikasiPasswordPetugas()">
+        <div id="staffPassError" style="display:none; color: #b42318; background: #fef3f2; border: 1px solid #fecdca; padding: 8px 12px; border-radius: 10px; font-size: 12px; margin-top: 8px; text-align: center; font-weight: 600;">
+          ❌ Password salah, coba lagi ya!
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top: 14px;">
+        <button class="btn-cute-primary" style="margin-top:0;" onclick="verifikasiPasswordPetugas()">
+          <i class="fas fa-sign-in-alt"></i> Masuk
+        </button>
+        <button class="btn-cute-secondary" style="margin-top:0;" onclick="batalAuthPetugas()">
+          Batal
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Freebies Decision Modal -->
   <div class="overlay" id="freebiesPopup">
     <div class="popup-box">
@@ -440,9 +467,9 @@
   <div id="view-register" class="view-section active-view">
     <div class="box">
       <div class="header-banner">
-        <img src="Logo Surcan.png" alt="Warehouse Sale Surya Cantik" onerror="this.style.display='none'">
+        <img src="Logo CBSS Vol.2.png" alt="Warehouse Sale Surya Cantik" onerror="this.style.display='none'">
         <div>
-          <span class="badge-sparkle"><i class="fas fa-sparkles"></i> GLOW & SHARE</span>
+          <span class="badge-sparkle"><i class="fas fa-sparkles"></i> GLOW & SHARE 2026</span>
         </div>
       </div>
       
@@ -511,7 +538,7 @@
   <div id="view-success" class="view-section">
     <div class="box" style="text-align: center;">
       <div class="header-banner">
-        <img src="Logo Surcan.png" alt="Warehouse Sale Surya Cantik" onerror="this.style.display='none'">
+        <img src="Logo CBSS Vol.2.png" alt="Warehouse Sale Surya Cantik" onerror="this.style.display='none'">
       </div>
 
       <div class="content">
@@ -572,7 +599,7 @@
   <div id="view-scanner" class="view-section">
     <div class="box">
       <div class="header-banner">
-        <img src="Logo Surcan.png" alt="Warehouse Sale Surya Cantik" onerror="this.style.display='none'">
+        <img src="Logo CBSS Vol.2.png" alt="Warehouse Sale Surya Cantik" onerror="this.style.display='none'">
         <div style="margin-top: 8px;">
           <span class="badge-sparkle" style="background: linear-gradient(135deg, #8a3ffc, #ff2d75);">
             <i class="fas fa-camera"></i> SCANNER PETUGAS
@@ -800,14 +827,35 @@
 
   <script>
     function bukaScanner() {
-      const pass = prompt("Masukkan password petugas:");
-      if(pass !== "surcan2025") {
-        alert("Password salah!");
-        window.location.hash = '';
-        return;
+      const authModal = document.getElementById("staffAuthModal");
+      const passInput = document.getElementById("staffPassInput");
+      const errBox = document.getElementById("staffPassError");
+      
+      errBox.style.display = "none";
+      passInput.value = "";
+      authModal.style.display = "flex";
+      setTimeout(() => passInput.focus(), 200);
+    }
+
+    function verifikasiPasswordPetugas() {
+      const passInput = document.getElementById("staffPassInput");
+      const errBox = document.getElementById("staffPassError");
+      
+      if (passInput.value === "surcan2025") {
+        document.getElementById("staffAuthModal").style.display = "none";
+        switchView('view-scanner');
+        initScanner();
+      } else {
+        errBox.style.display = "block";
+        passInput.value = "";
+        passInput.focus();
       }
-      switchView('view-scanner');
-      initScanner();
+    }
+
+    function batalAuthPetugas() {
+      document.getElementById("staffAuthModal").style.display = "none";
+      window.location.hash = '';
+      switchView('view-register');
     }
 
     function kembaliKeMenuDariScanner() {
