@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Scan QR Freebies</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 16px;
+    }
+
+    .box {
+      max-width: 420px;
+      margin: auto;
+      background: #fff;
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.15);
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 0;
+      color: #e91e63;
+    }
+
+    #result {
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    .header-logo {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .header-logo img {
+      max-width: 300px;
+      width: 100%;
+      height: auto;
+    }
+
+    .status {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .success {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .warning {
+      background: #fff8e1;
+      color: #ef6c00;
+    }
+
+    .danger {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      background: #e91e63;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      margin-top: 14px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #d81b60;
+    }
+
+    .popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 320px;
+}
+
+.popup-box button {
+  width: 48%;
+}
+    
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+
+  <div class="header-logo">
+    <img src="Logo CBSS Vol.2.png" alt="Header Event">
+  </div>
+
+  <h2>🎁 Scan QR Freebies</h2>
+
+  <div id="reader"></div>
+
+  <div id="result"></div>
+
+</div>
+
+<div class="popup" id="popup">
+  <div class="popup-box">
+
+    <p id="popupText"></p>
+
+    <button onclick="beriFreebies()">
+      YA
+    </button>
+
+    <button onclick="tolakFreebies()">
+      TIDAK
+    </button>
+
+  </div>
+</div>
+  
+<script>
+
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby3cYnaOeOwwYvikeZKEPHXhKTGxGNx6FzQHYw9yEvqFjmKSWoH9Sk9OKjrgqyj_gTx/exec";
+
+let sudahScan = false;
+let lastData = {};
+
+const qr = new Html5Qrcode("reader");
+
+qr.start(
+  { facingMode: "environment" },
+  {
+    fps: 10,
+    qrbox: 220
+  },
+
+  text => {
+
+    if (sudahScan) return;
+
+    sudahScan = true;
+
+    try {
+      new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg").play();
+    } catch(e){}
+
+    qr.stop();
+
+    let nama = "";
+    let wa = "";
+
+    if (text.includes("|")) {
+
+      const parts = text.split("|");
+
+      nama = parts[0].trim();
+      wa = parts[1].trim();
+
+    } else {
+
+      const parts = text.trim().split(/\s+/);
+
+      wa = parts.pop();
+      nama = parts.join(" ");
+
+    }
+
+    prosesScan(nama, wa);
+
+  }
+);
+
+function prosesScan(nama, wa) {
+
+  document.getElementById("result").innerHTML =
+    "⏳ Memproses data freebies...";
+
+  const fd = new FormData();
+
+  fd.append("action", "cek");
+fd.append("nama", nama);
+fd.append("wa", wa);
+
+  fetch(WEBAPP_URL, {
+    method: "POST",
+    body: fd
+  })
+
+  .then(r => r.json())
+
+  .then(res => {
+
+  lastData = res;
+
+  if (res.status === "BOLEH") {
+
+    document.getElementById("popupText").innerHTML =
+      "Customer ini memenuhi syarat mendapatkan freebies?";
+
+    document.getElementById("popup").style.display =
+      "flex";
+
+    return;
+  }
+
+  if (res.status === "SUDAH") {
+
+    document.getElementById("result").innerHTML = `
+
+      <div><b>Nama :</b> ${res.nama}</div>
+
+      <div style="margin-top:8px;">
+        <b>No. WA :</b> ${res.wa}
+      </div>
+
+      <div class="status" style="
+        background:#fff8e1;
+        color:#ef6c00;
+      ">
+        ⚠️ Sudah pernah mendapatkan freebies
+        <br><br>
+        Tanggal:
+        ${res.tanggal}
+      </div>
+
+      <button onclick="scanUlang()">
+        Scan Customer Berikutnya
+      </button>
+
+    `;
+  }
+
+})
+
+  .catch(err => {
+
+    document.getElementById("result").innerHTML = `
+
+      <div class="status danger">
+        ❌ Gagal menyimpan data
+      </div>
+
+      <button onclick="scanUlang()">
+        Coba Lagi
+      </button>
+
+    `;
+
+    console.error(err);
+
+  });
+
+}
+
+function beriFreebies() {
+
+  const fd = new FormData();
+
+  fd.append("action", "simpan");
+  fd.append("nama", lastData.nama);
+  fd.append("wa", lastData.wa);
+
+  fetch(WEBAPP_URL,{
+    method:"POST",
+    body:fd
+  })
+
+  .then(r=>r.json())
+
+  .then(()=>{
+
+    document.getElementById("popup").style.display =
+      "none";
+
+    document.getElementById("result").innerHTML = `
+
+      <div><b>Nama :</b> ${lastData.nama}</div>
+
+      <div><b>No. WA :</b> ${lastData.wa}</div>
+
+      <div class="status">
+        🎁 FREEBIES DIBERIKAN
+      </div>
+
+      <button onclick="scanUlang()">
+        Scan Customer Berikutnya
+      </button>
+
+    `;
+
+  });
+
+}
+
+function tolakFreebies() {
+
+  document.getElementById("popup").style.display =
+    "none";
+
+  document.getElementById("result").innerHTML = `
+
+    <div><b>Nama :</b> ${lastData.nama}</div>
+
+    <div><b>No. WA :</b> ${lastData.wa}</div>
+
+    <div class="status" style="
+      background:#ffebee;
+      color:#c62828;
+    ">
+      ❌ FREEBIES TIDAK DIBERIKAN
+    </div>
+
+    <button onclick="scanUlang()">
+      Scan Customer Berikutnya
+    </button>
+
+  `;
+
+}
+
+function scanUlang() {
+  location.reload();
+}
+
+</script>
+
+</body>
+</html>
