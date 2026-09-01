@@ -1,412 +1,568 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Formulir Pendaftaran Warehouse Sale Surya Cantik</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Sistem Glow & Share Surya Cantik</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
-  * { box-sizing: border-box; }
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #ff9acb, #ffc1dd);
-  padding: 20px;
-}
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff9acb, #ffc1dd);
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
 
-.box {
-  max-width: 650px;
-  background: #ffffff;
-  margin: auto;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 12px 30px rgba(0,0,0,.18);
-}
+    .view-section { display: none; width: 100%; max-width: 650px; }
+    .active-view { display: block; }
 
-.header {
-  text-align: center;
-  padding: 6px 10px;
-  background: #ffe3f0;
-}
+    .box {
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,.18);
+      width: 100%;
+    }
 
-.header .banner {
-  width: 100%;
-  max-width: 520px;
-  height: auto;
-  display: inline-block;
-}
+    .header { text-align: center; padding: 6px 10px; background: #ffe3f0; }
+    .header img { width: 100%; max-width: 520px; height: auto; display: inline-block; }
+    .content { padding: 22px; }
 
-.content { padding: 22px; }
+    h2 { text-align: center; color: #e91e63; margin-bottom: 22px; font-size: 18px; }
+    label { font-weight: bold; margin-top: 14px; display: block; font-size: 14px;}
+    input, select, textarea {
+      width: 100%; padding: 14px; margin-top: 6px;
+      border-radius: 8px; border: 1px solid #ccc; font-size: 16px; /* 16px mencegah auto-zoom di iOS */
+    }
+    
+    button.btn-primary {
+      width: 100%; background: #e91e63; color: #fff;
+      border: none; padding: 16px; margin-top: 26px;
+      font-size: 16px; font-weight: bold; border-radius: 10px; cursor: pointer;
+    }
+    button.btn-primary:hover { background: #d81b60; }
+    
+    button.btn-secondary {
+      width: 100%; background: #fff; color: #e91e63;
+      border: 2px solid #e91e63; padding: 16px; margin-top: 10px;
+      font-size: 16px; font-weight: bold; border-radius: 10px; cursor: pointer;
+    }
 
-h2 {
-  text-align: center;
-  color: #e91e63;
-  margin-bottom: 22px;
-  font-size: 18px;
-}
+    /* Loading & Popups */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      display: none; align-items: center; justify-content: center;
+      z-index: 999; padding: 20px;
+    }
+    .popup-box {
+      background: #fff; padding: 24px; border-radius: 12px;
+      text-align: center; max-width: 350px; width: 100%;
+    }
+    .popup-box .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+    .popup-box p { font-size: 16px; line-height: 1.5; margin-bottom: 15px; }
+    
+    .loading-text { font-size: 18px; font-weight: bold; color: #e91e63; text-align: center;}
 
+    /* QR Code & Scanner */
+    .qr-container { display: flex; justify-content: center; margin: 22px auto; }
+    #reader { width: 100%; margin-top: 10px; border-radius: 8px; overflow: hidden; }
+    
+    .status-msg {
+      font-size: 16px; font-weight: bold; margin-top: 15px;
+      padding: 12px; border-radius: 8px; text-align: center;
+    }
+    .status-success { background: #e8f5e9; color: #2e7d32; }
+    .status-warning { background: #fff8e1; color: #ef6c00; }
+    .status-danger { background: #ffebee; color: #c62828; }
 
-label {
-  font-weight: bold;
-  margin-top: 14px;
-  display: block;
-}
-
-input, select, textarea {
-  width: 100%;
-  padding: 11px;
-  margin-top: 6px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-textarea { resize: vertical; }
-
-.desc {
-  font-size: 13px;
-  background: #fff0f7;
-  padding: 14px;
-  border-radius: 8px;
-  margin-top: 10px;
-  line-height: 1.6;
-}
-
-button {
-  width: 100%;
-  background: #e91e63;
-  color: #fff;
-  border: none;
-  padding: 15px;
-  margin-top: 26px;
-  font-size: 16px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-button:hover { background: #d81b60; }
-
-.loading {
-  position: fixed;
-  inset: 0;
-  background: rgba(255,255,255,.92);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 20px;
-  font-size: 18px;
-  font-weight: bold;
-  line-height: 1.5;
-  color: #e91e63;
-  z-index: 999;
-}
-
-</style>
+    /* Success Page specifics */
+    .follow-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; } /* 1 kolom di mobile */
+    @media (min-width: 480px) {
+      .follow-grid { grid-template-columns: 1fr 1fr; } /* 2 kolom di tablet/desktop */
+    }
+    .follow-line { display: flex; align-items: center; gap: 6px; font-size: 14px; text-align: left;}
+    .follow-line a { color: #e91e63; text-decoration: none; font-weight: bold;}
+    .maps-full { grid-column: 1 / span 2; }
+  </style>
 </head>
-
 <body>
 
-<div class="loading" id="loading">
-  ⏳ Mengirim data & menyiapkan WhatsApp...<br><br>
-  Mohon kirim pesan WhatsApp yang akan terbuka
-  untuk menyelesaikan proses pendaftaran 😊
-</div>
-
-<div class="box">
-  <div class="header">
-    <img src="Logo CBSS Vol.2.png" class="banner">
+  <!-- Global Loading -->
+  <div class="overlay" id="loadingOverlay">
+    <div class="popup-box">
+      <div class="loading-text" id="loadingText">⏳ Memproses...</div>
+    </div>
   </div>
 
-  <div class="content">
-    <p class="event-desc">
-  <b>Warehouse Sale Surya Cantik</b> hadir dengan segudang
-  <b>Promo Spesial</b>, <b>Diskon Besar</b>, <b>Free Produk di jam tertentu</b>,
-  <b>Games Berhadiah</b>, dan berbagai <b>Activity Seru</b> yang sayang untuk dilewatkan!
-</p>
-
-<h2>FORMULIR PENDAFTARAN</h2>
-
-    <form id="regForm">
-
-      <label>Nama Lengkap</label>
-      <input type="text" name="nama" required>
-
-      <label>Jenis Kelamin</label>
-      <select name="jk" required>
-        <option value="">-- Pilih --</option>
-        <option>Laki-laki</option>
-        <option>Perempuan</option>
-      </select>
-
-      <label>Tanggal Lahir</label>
-
-<div style="display:flex; gap:8px;">
-  <select id="tgl" required>
-    <option value="">Tanggal</option>
-  </select>
-
-  <select id="bln" required>
-    <option value="">Bulan</option>
-  </select>
-
-  <select id="thn" required>
-    <option value="">Tahun</option>
-  </select>
-</div>
-
-<input type="hidden" name="tgl_lahir" id="tgl_lahir">
-
-      <label>Nomor WhatsApp</label>
-      <input type="tel" name="wa" required placeholder="0838777xxxxx">
-
-      <label>Provinsi</label>
-<select id="provinsi" name="provinsi" required>
-  <option value="">Memuat...</option>
-</select>
-
-<label>Kabupaten/Kota</label>
-<select id="kabupaten" name="kabupaten" required disabled>
-  <option value="">Pilih Provinsi</option>
-</select>
-
-<label>Kecamatan</label>
-<select id="kecamatan" name="kecamatan" required disabled>
-  <option value="">Pilih Kabupaten</option>
-</select>
-
-<label>Desa/Kelurahan</label>
-<select id="desa" name="desa" required disabled>
-  <option value="">Pilih Kecamatan</option>
-</select>
-
-
-      <button type="submit">DAFTAR</button>
-    </form>
+  <!-- Freebies Popup Decision -->
+  <div class="overlay" id="freebiesPopup">
+    <div class="popup-box">
+      <h3 style="color:#e91e63; margin-top:0;">Info Freebies</h3>
+      <p id="freebiesMessage"></p>
+      <div class="btn-row" id="freebiesBtnRow">
+        <button class="btn-primary" onclick="prosesFreebies(true)">YA, Berikan</button>
+        <button class="btn-secondary" onclick="prosesFreebies(false)">TIDAK</button>
+      </div>
+      <button class="btn-secondary" id="closeFreebiesBtn" style="display:none;" onclick="tutupPopupDanLanjut()">Tutup & Lanjut</button>
+    </div>
   </div>
-</div>
 
-<script>
-const form = document.getElementById("regForm");
-const loading = document.getElementById("loading");
+  <!-- VIEW: FORM PENDAFTARAN -->
+  <div id="view-register" class="view-section active-view">
+    <div class="box">
+      <div class="header">
+        <img src="https://placehold.co/520x200/ffe3f0/e91e63?text=Banner+Surya+Cantik" alt="Banner" onerror="this.style.display='none'">
+      </div>
+      <div class="content">
+        <h2>FORMULIR PENDAFTARAN</h2>
+        <form id="regForm">
+          <label>Nama Lengkap</label>
+          <input type="text" name="nama" required>
 
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbx4u-4J53Dig28cstEE-eT6WuzKX5_4MLr7-n681GOfBRTQPD3UOlwjZ56UH_2OUis/exec";
-const SUCCESS_URL = "https://suryatokoku.my.id/SURCAN-WHS/sukses.html";
+          <label>Jenis Kelamin</label>
+          <select name="jk" required>
+            <option value="">-- Pilih --</option>
+            <option>Laki-laki</option>
+            <option>Perempuan</option>
+          </select>
 
-form.addEventListener("submit", function(e) {
-  e.preventDefault();
-  loading.style.display = "flex";
+          <label>Tanggal Lahir</label>
+          <div style="display:flex; gap:8px;">
+            <select id="tgl" required><option value="">Tanggal</option></select>
+            <select id="bln" required><option value="">Bulan</option></select>
+            <select id="thn" required><option value="">Tahun</option></select>
+          </div>
+          <input type="hidden" name="tgl_lahir" id="tgl_lahir">
 
-  fetch(WEBAPP_URL, {
-    method: "POST",
-    body: new FormData(form)
-  })
-  .then(r => r.text())
-  .then(t => {
-  if (t.trim() === "OK") {
+          <label>Nomor WhatsApp</label>
+          <input type="tel" name="wa" required placeholder="0838777xxxxx">
 
-    const nama = form.nama.value;
-const wa = form.wa.value;
-const jk = form.jk.value;
+          <label>Provinsi</label>
+          <select id="provinsi" name="provinsi" required><option value="">Memuat...</option></select>
 
-// hitung usia
-const tglLahir = new Date(form.tgl_lahir.value);
-const hariIni = new Date();
+          <label>Kabupaten/Kota</label>
+          <select id="kabupaten" name="kabupaten" required disabled><option value="">Pilih Provinsi</option></select>
 
-let usia = hariIni.getFullYear() - tglLahir.getFullYear();
+          <label>Kecamatan</label>
+          <select id="kecamatan" name="kecamatan" required disabled><option value="">Pilih Kabupaten</option></select>
 
-const bulan = hariIni.getMonth() - tglLahir.getMonth();
+          <label>Desa/Kelurahan</label>
+          <select id="desa" name="desa" required disabled><option value="">Pilih Kecamatan</option></select>
 
-if (
-  bulan < 0 ||
-  (bulan === 0 && hariIni.getDate() < tglLahir.getDate())
-){
-  usia--;
-}
+          <button type="submit" class="btn-primary">DAFTAR SEKARANG</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
-    const successLink =
-      SUCCESS_URL +
-      "?nama=" + encodeURIComponent(nama) +
-      "&wa=" + encodeURIComponent(wa);
+  <!-- VIEW: SUKSES -->
+  <div id="view-success" class="view-section">
+    <div class="box" style="padding: 18px 26px 32px 26px; text-align: center;">
+      <h2>Pendaftaran Berhasil 🎉</h2>
+      <p style="font-size: 14px; text-align: left;">
+        Terima kasih telah mendaftar! <br>Silakan <b>screenshot QR Code</b> di bawah ini dan tunjukkan kepada staff kami.
+      </p>
+      
+      <div id="qrcode" class="qr-container"></div>
+      
+      <div style="text-align: left; font-size: 13px; background: #fff0f7; padding: 10px; border-radius: 8px;">
+        🎁 Dapatkan <b>gratis kosmetik</b> untuk 100 pelanggan pertama (Syarat follow Sosmed).
+      </div>
+      
+      <div class="follow-grid">
+        <div class="follow-line"><i class="fab fa-instagram" style="color:#E1306C"></i> <a href="#">@suryatokoku.id</a></div>
+        <div class="follow-line"><i class="fab fa-instagram" style="color:#E1306C"></i> <a href="#">@suryafluencers</a></div>
+        <div class="follow-line"><i class="fab fa-tiktok" style="color:#000"></i> <a href="#">@suryatokoku.id</a></div>
+        <div class="follow-line"><i class="fab fa-whatsapp" style="color:#25D366"></i> <a href="#">Channel WA</a></div>
+        <div class="follow-line maps-full"><i class="fas fa-map-marker-alt" style="color:#34A853"></i> <a href="#">Review Maps</a></div>
+      </div>
 
-    const pesan =
-`Hallo kak 😊 Saya sudah daftar di Glow & Share Surya Cantik.
+      <button class="btn-primary" onclick="kirimWaKonfirmasi()">
+        <i class="fab fa-whatsapp"></i> Konfirmasi ke Admin
+      </button>
+      <button class="btn-secondary" onclick="location.reload()">Selesai</button>
+    </div>
+  </div>
 
-👤 Nama : ${nama}
-🚻 Jenis Kelamin : ${jk}
-🎂 Usia : ${usia} Tahun
+  <!-- VIEW: SCANNER ADMIN -->
+  <div id="view-scanner" class="view-section">
+    <div class="box">
+      <div class="header">
+        <h2 style="margin: 10px 0;">📷 Scanner Event & Freebies</h2>
+      </div>
+      <div class="content">
+        <div id="reader"></div>
+        <div id="scanResultArea" style="display:none;">
+          <div style="background: #f5f5f5; padding: 15px; border-radius: 8px;">
+            <div style="margin-bottom: 5px;"><b>Nama:</b> <span id="resNama"></span></div>
+            <div><b>WA:</b> <span id="resWa"></span></div>
+          </div>
+          <div id="statusBox" class="status-msg"></div>
+          
+          <button class="btn-primary" onclick="resetScanner()">Scan Berikutnya</button>
+        </div>
+        <button class="btn-secondary" onclick="kembaliKeMenuDariScanner()">Kembali ke Menu</button>
+      </div>
+    </div>
+  </div>
 
-Berikut bukti pendaftaran saya:
+  <script>
+    // --- KONFIGURASI SUPABASE ---
+    const SUPABASE_URL = 'https://umjhmczidrzeqhubujyt.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtamhtY3ppZHJ6ZXFodWJ1anl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3MTUwNTgsImV4cCI6MjEwMjI5MTA1OH0.DUU2cPg_Rue_zY0HtQB-9R8YDBeJkuEchJfX9OR4jqo';
+    
+    // Inisialisasi Supabase
+    let supabaseClient;
+    try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch(e) {
+        console.warn("Supabase belum dikonfigurasi.");
+    }
 
-${successLink}`;
+    // Variabel Global
+    let html5QrcodeScanner = null;
+    let currentScanData = { nama: "", wa: "" };
+    let temporaryRegData = { nama: "", wa: "" };
 
-    // redirect saat user kembali ke browser
-    function kembaliKeSukses() {
-      if (!document.hidden) {
-        document.removeEventListener(
-          "visibilitychange",
-          kembaliKeSukses
-        );
+    // Utilitas Ganti View
+    function switchView(viewId) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+      document.getElementById(viewId).classList.add('active-view');
+    }
 
-        window.location.href = successLink;
+    // Routing URL Halaman Petugas
+    function checkRoute() {
+      if (window.location.hash === '#petugas') {
+        bukaScanner();
+      } else {
+        switchView('view-register');
       }
     }
 
-    document.addEventListener(
-      "visibilitychange",
-      kembaliKeSukses
-    );
+    // Pengecekan saat halaman pertama dimuat dan saat hash URL diubah manual
+    window.addEventListener('load', checkRoute);
+    window.addEventListener('hashchange', checkRoute);
 
-    // buka WA di tab yang sama
-    setTimeout(() => {
+    function showLoading(msg) {
+      document.getElementById("loadingText").innerHTML = msg;
+      document.getElementById("loadingOverlay").style.display = "flex";
+    }
 
-  window.location.href =
-  "https://wa.me/628131310110?text=" +
-  encodeURIComponent(pesan);
+    function hideLoading() {
+      document.getElementById("loadingOverlay").style.display = "none";
+    }
 
-}, 2000);
+  </script>
 
-  } else {
-    throw t;
-  }
-})
-  .catch(err => {
-    alert("Gagal mengirim data");
-    loading.style.display = "none";
-    console.error(err);
-  });
-});
+  <script>
+    // --- LOGIKA FORM PENDAFTARAN ---
+    const form = document.getElementById("regForm");
+    
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      
+      if (!supabaseClient) {
+          alert("Sistem belum terhubung ke database. Silakan config Supabase URL.");
+          return;
+      }
 
-</script>
+      showLoading("⏳ Menyimpan pendaftaran...");
+      
+      const formData = new FormData(form);
+      const dataInsert = {
+        nama: formData.get("nama"),
+        jk: formData.get("jk"),
+        tgl_lahir: formData.get("tgl_lahir"),
+        wa: formData.get("wa"),
+        provinsi: formData.get("provinsi"),
+        kabupaten: formData.get("kabupaten"),
+        kecamatan: formData.get("kecamatan"),
+        desa: formData.get("desa")
+      };
 
-<script>
-const provinsi = document.getElementById("provinsi");
-const kabupaten = document.getElementById("kabupaten");
-const kecamatan = document.getElementById("kecamatan");
-const desa = document.getElementById("desa");
+      // Simpan sementara untuk link WA Konfirmasi
+      temporaryRegData.nama = dataInsert.nama;
+      temporaryRegData.wa = dataInsert.wa;
 
-const API = "https://www.emsifa.com/api-wilayah-indonesia/api";
+      try {
+        // Insert ke tabel 'registrations-G&S SURCAN'
+        const { error } = await supabaseClient.from('registrations-G&S SURCAN').insert([dataInsert]);
+        if (error) throw error;
+        
+        hideLoading();
+        generateQR(dataInsert.nama, dataInsert.wa);
+        switchView("view-success");
 
-async function loadProvinsi() {
-  const res = await fetch(`${API}/provinces.json`);
-  const data = await res.json();
+      } catch (err) {
+        hideLoading();
+        alert("Gagal mengirim data. Pastikan koneksi lancar.\n" + err.message);
+        console.error(err);
+      }
+    });
 
-  provinsi.innerHTML = '<option value="">-- Pilih Provinsi --</option>';
+    // Generate QR di Halaman Sukses
+    function generateQR(nama, wa) {
+      document.getElementById("qrcode").innerHTML = "";
+      const qrText = nama + "|" + wa; // Format: Nama|WA
+      new QRCode(document.getElementById("qrcode"), {
+        text: qrText, width: 180, height: 180
+      });
+    }
 
-  data.forEach(item=>{
-    provinsi.innerHTML +=
-      `<option value="${item.name}" data-id="${item.id}">
-        ${item.name}
-      </option>`;
-  });
-}
+    // Tombol WA Konfirmasi
+    function kirimWaKonfirmasi() {
+      const urlAplikasi = window.location.href.split('?')[0]; // URL saat ini
+      const pesan = `Halo kak 😊 Saya sudah daftar di Glow & Share Surya Cantik.\n\n👤 Nama : ${temporaryRegData.nama}\n📱 WA : ${temporaryRegData.wa}\n\nLink Aplikasi: ${urlAplikasi}`;
+      window.open("https://wa.me/628131310110?text=" + encodeURIComponent(pesan), "_blank");
+    }
+  </script>
 
-provinsi.addEventListener("change", async ()=>{
+  <script>
+    // --- LOGIKA API WILAYAH (EMSIFA) ---
+    const provEl = document.getElementById("provinsi");
+    const kabEl = document.getElementById("kabupaten");
+    const kecEl = document.getElementById("kecamatan");
+    const desaEl = document.getElementById("desa");
+    const API = "https://www.emsifa.com/api-wilayah-indonesia/api";
 
-  kabupaten.disabled = false;
-  kecamatan.disabled = true;
-  desa.disabled = true;
+    async function loadProvinsi() {
+      try {
+        const res = await fetch(`${API}/provinces.json`);
+        const data = await res.json();
+        provEl.innerHTML = '<option value="">-- Pilih Provinsi --</option>';
+        data.forEach(item => {
+          provEl.innerHTML += `<option value="${item.name}" data-id="${item.id}">${item.name}</option>`;
+        });
+      } catch(e) { provEl.innerHTML = '<option value="">Gagal memuat wilayah</option>'; }
+    }
 
-  const id = provinsi.selectedOptions[0].dataset.id;
+    provEl.addEventListener("change", async ()=>{
+      kabEl.disabled = false; kecEl.disabled = true; desaEl.disabled = true;
+      const id = provEl.selectedOptions[0].dataset.id;
+      if(!id) return;
+      const res = await fetch(`${API}/regencies/${id}.json`);
+      const data = await res.json();
+      kabEl.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>';
+      data.forEach(item => { kabEl.innerHTML += `<option value="${item.name}" data-id="${item.id}">${item.name}</option>`; });
+    });
 
-  const res = await fetch(`${API}/regencies/${id}.json`);
-  const data = await res.json();
+    kabEl.addEventListener("change", async ()=>{
+      kecEl.disabled=false; desaEl.disabled=true;
+      const id = kabEl.selectedOptions[0].dataset.id;
+      if(!id) return;
+      const res=await fetch(`${API}/districts/${id}.json`);
+      const data=await res.json();
+      kecEl.innerHTML='<option value="">-- Pilih Kecamatan --</option>';
+      data.forEach(item => { kecEl.innerHTML += `<option value="${item.name}" data-id="${item.id}">${item.name}</option>`; });
+    });
 
-  kabupaten.innerHTML =
-  '<option value="">-- Pilih Kabupaten/Kota --</option>';
+    kecEl.addEventListener("change", async ()=>{
+      desaEl.disabled=false;
+      const id = kecEl.selectedOptions[0].dataset.id;
+      if(!id) return;
+      const res=await fetch(`${API}/villages/${id}.json`);
+      const data=await res.json();
+      desaEl.innerHTML='<option value="">-- Pilih Desa/Kelurahan --</option>';
+      data.forEach(item => { desaEl.innerHTML += `<option value="${item.name}">${item.name}</option>`; });
+    });
 
-  data.forEach(item=>{
-    kabupaten.innerHTML +=
-      `<option value="${item.name}" data-id="${item.id}">
-      ${item.name}
-      </option>`;
-  });
+    // --- LOGIKA TANGGAL ---
+    const tgl = document.getElementById("tgl"), bln = document.getElementById("bln"), thn = document.getElementById("thn"), tglLahir = document.getElementById("tgl_lahir");
+    for(let i=1; i<=31; i++) tgl.innerHTML += `<option value="${i}">${i}</option>`;
+    const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    bulan.forEach((b,i) => bln.innerHTML += `<option value="${String(i+1).padStart(2,"0")}">${b}</option>`);
+    for(let i=new Date().getFullYear(); i>=1950; i--) thn.innerHTML += `<option value="${i}">${i}</option>`;
+    
+    function updateTanggal(){
+      if(tgl.value && bln.value && thn.value) {
+        tglLahir.value = `${thn.value}-${bln.value}-${String(tgl.value).padStart(2,"0")}`;
+      }
+    }
+    tgl.addEventListener("change",updateTanggal); bln.addEventListener("change",updateTanggal); thn.addEventListener("change",updateTanggal);
+    
+    // Inisialisasi API Wilayah
+    loadProvinsi();
+  </script>
 
-});
+  <script>
+    // --- LOGIKA SCANNER & FREEBIES TERPUSAT ---
 
-kabupaten.addEventListener("change", async ()=>{
+    function bukaScanner() {
+      const pass = prompt("Masukkan password admin:");
+      if(pass !== "surya123") {
+        alert("Password salah!");
+        window.location.hash = ''; // Hapus hash dan kembalikan ke form
+        return;
+      }
+      switchView('view-scanner');
+      initScanner();
+    }
 
-  kecamatan.disabled=false;
+    function kembaliKeMenuDariScanner() {
+        if(html5QrcodeScanner) {
+            html5QrcodeScanner.stop().then(() => {
+                window.location.hash = ''; // Hapus hash (kembali ke form)
+            }).catch(err => {
+                window.location.hash = '';
+            });
+        } else {
+            window.location.hash = '';
+        }
+    }
 
-  const id=kabupaten.selectedOptions[0].dataset.id;
+    function initScanner() {
+      document.getElementById('reader').style.display = 'block';
+      document.getElementById('scanResultArea').style.display = 'none';
 
-  const res=await fetch(`${API}/districts/${id}.json`);
-  const data=await res.json();
+      html5QrcodeScanner = new Html5Qrcode("reader");
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        async (decodedText) => {
+          // Pause scanner
+          html5QrcodeScanner.pause(true);
+          try { new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg").play(); } catch(e){}
+          
+          let nama = "", wa = "";
+          if (decodedText.includes("|")) {
+            const parts = decodedText.split("|");
+            nama = parts[0].trim(); wa = parts[1].trim();
+          } else {
+            const parts = decodedText.trim().split(/\s+/);
+            wa = parts.pop(); nama = parts.join(" ");
+          }
+          
+          currentScanData = { nama, wa };
+          await prosesScanMasukDanFreebies(nama, wa);
+        }
+      ).catch(err => {
+         console.warn("Gagal akses kamera", err);
+         alert("Izinkan akses kamera untuk menggunakan scanner.");
+      });
+    }
 
-  kecamatan.innerHTML=
-  '<option value="">-- Pilih Kecamatan --</option>';
+    function resetScanner() {
+      document.getElementById('scanResultArea').style.display = 'none';
+      document.getElementById('reader').style.display = 'block';
+      if(html5QrcodeScanner) html5QrcodeScanner.resume();
+    }
 
-  data.forEach(item=>{
-      kecamatan.innerHTML +=
-      `<option value="${item.name}" data-id="${item.id}">
-      ${item.name}
-      </option>`;
-  });
+    // Fungsi Utama Pemrosesan Scan
+    async function prosesScanMasukDanFreebies(nama, wa) {
+      if (!supabaseClient) { alert("Supabase belum disetting!"); return; }
+      
+      document.getElementById('reader').style.display = 'none';
+      document.getElementById('scanResultArea').style.display = 'block';
+      document.getElementById('resNama').innerText = nama;
+      document.getElementById('resWa').innerText = wa;
+      
+      const statBox = document.getElementById('statusBox');
+      statBox.className = "status-msg";
+      statBox.innerText = "⏳ Memproses Kehadiran...";
 
-});
+      try {
+        // 1. Catat Kehadiran Pintu Masuk
+        await supabaseClient.from('scans-G&S SURCAN').insert([{ nama: nama, wa: wa, tipe: 'hadir' }]);
+        
+        statBox.className = "status-msg status-success";
+        statBox.innerHTML = "✅ Kehadiran Dicatat<br><small>Mengecek kuota freebies...</small>";
 
-kecamatan.addEventListener("change", async ()=>{
+        // 2. Cek Kuota Freebies Hari Ini (Timezone Lokal sederhana)
+        const today = new Date();
+        // Set ke jam 00:00 hari ini
+        today.setHours(0,0,0,0);
+        const todayStr = today.toISOString(); 
 
-  desa.disabled=false;
+        const { count: freebiesCount, error: countErr } = await supabaseClient.from('scans-G&S SURCAN')
+          .select('*', { count: 'exact', head: true })
+          .eq('tipe', 'freebie')
+          .gte('created_at', todayStr);
+        
+        if (countErr) throw countErr;
 
-  const id=kecamatan.selectedOptions[0].dataset.id;
+        if (freebiesCount >= 20) {
+            tampilkanStatusAkhir("warning", `⚠️ Kuota Freebies Habis (Hari ini: ${freebiesCount}/20).<br>Hanya kehadiran yang dicatat.`);
+            return;
+        }
 
-  const res=await fetch(`${API}/villages/${id}.json`);
-  const data=await res.json();
+        // 3. Cek apakah customer sudah klaim hari ini (atau pernah klaim)
+        const { data: cekKlaim, error: cekErr } = await supabaseClient.from('scans-G&S SURCAN')
+          .select('*')
+          .eq('tipe', 'freebie')
+          .eq('wa', wa)
+          .limit(1);
+        
+        if (cekErr) throw cekErr;
 
-  desa.innerHTML=
-  '<option value="">-- Pilih Desa/Kelurahan --</option>';
+        if (cekKlaim && cekKlaim.length > 0) {
+             tampilkanStatusAkhir("warning", `⚠️ Customer sudah pernah mendapatkan Freebies sebelumnya.<br>Hanya kehadiran yang dicatat.`);
+             return;
+        }
 
-  data.forEach(item=>{
-      desa.innerHTML +=
-      `<option value="${item.name}">
-      ${item.name}
-      </option>`;
-  });
+        // 4. Jika lolos semua, tanyakan ke admin apakah memenuhi syarat follow dsb.
+        tampilkanPopupFreebies(`Sisa kuota hari ini: <b>${20 - freebiesCount}</b>.<br><br>Apakah customer ini (${nama}) telah menunjukkan bukti follow sosmed dan berhak mendapat freebies?`);
 
-});
+      } catch (err) {
+        console.error(err);
+        tampilkanStatusAkhir("danger", "❌ Terjadi kesalahan jaringan / database.");
+      }
+    }
 
-loadProvinsi();
-</script>
+    function tampilkanStatusAkhir(tipe, pesan) {
+        const statBox = document.getElementById('statusBox');
+        statBox.className = `status-msg status-${tipe}`;
+        statBox.innerHTML = pesan;
+    }
 
-<script>
-const tgl = document.getElementById("tgl");
-const bln = document.getElementById("bln");
-const thn = document.getElementById("thn");
-const tglLahir = document.getElementById("tgl_lahir");
+    function tampilkanPopupFreebies(msg) {
+        document.getElementById("freebiesMessage").innerHTML = msg;
+        document.getElementById("freebiesBtnRow").style.display = "flex";
+        document.getElementById("closeFreebiesBtn").style.display = "none";
+        document.getElementById("freebiesPopup").style.display = "flex";
+    }
 
-// isi tanggal
-for(let i=1;i<=31;i++){
-  tgl.innerHTML += `<option value="${i}">${i}</option>`;
-}
+    async function prosesFreebies(disetujui) {
+        if(!disetujui) {
+            document.getElementById("freebiesPopup").style.display = "none";
+            tampilkanStatusAkhir("danger", "❌ Freebies TIDAK diberikan (Syarat tidak terpenuhi).");
+            return;
+        }
 
-// isi bulan
-const bulan = [
-"Januari","Februari","Maret","April","Mei","Juni",
-"Juli","Agustus","September","Oktober","November","Desember"
-];
+        // Jika disetujui, insert ke database tipe = freebie
+        document.getElementById("freebiesBtnRow").style.display = "none";
+        document.getElementById("freebiesMessage").innerHTML = "⏳ Menyimpan data freebies...";
 
-bulan.forEach((b,i)=>{
-  bln.innerHTML +=
-  `<option value="${String(i+1).padStart(2,"0")}">${b}</option>`;
-});
+        try {
+            await supabaseClient.from('scans-G&S SURCAN').insert([{ 
+                nama: currentScanData.nama, 
+                wa: currentScanData.wa, 
+                tipe: 'freebie' 
+            }]);
+            
+            document.getElementById("freebiesMessage").innerHTML = "✅ <b>FREEBIES BERHASIL DIBERIKAN!</b>";
+            tampilkanStatusAkhir("success", "✅ Kehadiran & Freebies Dicatat");
+        } catch (err) {
+            document.getElementById("freebiesMessage").innerHTML = "❌ Gagal menyimpan data freebies.";
+            tampilkanStatusAkhir("danger", "❌ Kehadiran sukses, tapi Freebies gagal dicatat.");
+        }
+        
+        document.getElementById("closeFreebiesBtn").style.display = "block";
+    }
 
-// isi tahun (2026 mundur sampai 1950)
-for(let i=new Date().getFullYear();i>=1950;i--){
-  thn.innerHTML += `<option value="${i}">${i}</option>`;
-}
+    function tutupPopupDanLanjut() {
+        document.getElementById("freebiesPopup").style.display = "none";
+    }
 
-// gabungkan ke format yyyy-mm-dd
-function updateTanggal(){
-  if(tgl.value && bln.value && thn.value){
-    tglLahir.value =
-    `${thn.value}-${bln.value}-${String(tgl.value).padStart(2,"0")}`;
-  }
-}
-
-tgl.addEventListener("change",updateTanggal);
-bln.addEventListener("change",updateTanggal);
-thn.addEventListener("change",updateTanggal);
-</script> 
- 
+  </script>
 </body>
 </html>
