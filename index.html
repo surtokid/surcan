@@ -92,7 +92,6 @@
     }
     .follow-line { display: flex; align-items: center; gap: 6px; font-size: 14px; text-align: left;}
     .follow-line a { color: #e91e63; text-decoration: none; font-weight: bold;}
-    .maps-full { grid-column: 1 / span 2; }
   </style>
 </head>
 <body>
@@ -176,21 +175,19 @@
       <div id="qrcode" class="qr-container"></div>
       
       <div style="text-align: left; font-size: 13px; background: #fff0f7; padding: 10px; border-radius: 8px;">
-        🎁 Dapatkan <b>gratis kosmetik</b> untuk 100 pelanggan pertama (Syarat follow Sosmed).
+        🎁 Dapatkan <b>gratis kosmetik</b> untuk 20 pelanggan pertama (Syarat follow Sosmed).
       </div>
       
       <div class="follow-grid">
-        <div class="follow-line"><i class="fab fa-instagram" style="color:#E1306C"></i> <a href="#">@suryatokoku.id</a></div>
-        <div class="follow-line"><i class="fab fa-instagram" style="color:#E1306C"></i> <a href="#">@suryafluencers</a></div>
-        <div class="follow-line"><i class="fab fa-tiktok" style="color:#000"></i> <a href="#">@suryatokoku.id</a></div>
-        <div class="follow-line"><i class="fab fa-whatsapp" style="color:#25D366"></i> <a href="#">Channel WA</a></div>
-        <div class="follow-line maps-full"><i class="fas fa-map-marker-alt" style="color:#34A853"></i> <a href="#">Review Maps</a></div>
+        <div class="follow-line"><i class="fab fa-instagram" style="color:#E1306C"></i> <a href="https://www.instagram.com/suryacantik.id?igsi=MWF3cGdvbjBkZHNocA==" target="_blank">@suryacantik.id</a></div>
+        <div class="follow-line"><i class="fab fa-tiktok" style="color:#000"></i> <a href="https://www.instagram.com/suryacantik.id?igsi=MWF3cGdvbjBkZHNocA==" target="_blank">@suryacantiksay</a></div>
+        <div class="follow-line"><i class="fab fa-whatsapp" style="color:#25D366"></i> <a href="https://whatsapp.com/channel/0029VbBZzgC9mrGhrSZtpw0C" target="_blank">Channel WA</a></div>
+        <div class="follow-line"><i class="fas fa-map-marker-alt" style="color:#34A853"></i> <a href="https://maps.app.goo.gl/MQyJeSCnjrffz2Mo6" target="_blank">Review Maps</a></div>
       </div>
 
       <button class="btn-primary" onclick="kirimWaKonfirmasi()">
         <i class="fab fa-whatsapp"></i> Konfirmasi ke Admin
       </button>
-      <button class="btn-secondary" onclick="location.reload()">Selesai</button>
     </div>
   </div>
 
@@ -241,10 +238,19 @@
       document.getElementById(viewId).classList.add('active-view');
     }
 
-    // Routing URL Halaman Petugas
+    // Routing URL Halaman Petugas dan Cek Akses Bukti QR via URL Query
     function checkRoute() {
+      const params = new URLSearchParams(window.location.search);
       if (window.location.hash === '#petugas') {
         bukaScanner();
+      } else if (params.get("nama") && params.get("wa")) {
+        // Jika link dibuka kembali oleh peserta (memiliki query ?nama=...&wa=...)
+        const nama = params.get("nama");
+        const wa = params.get("wa");
+        temporaryRegData.nama = nama;
+        temporaryRegData.wa = wa;
+        generateQR(nama, wa);
+        switchView('view-success');
       } else {
         switchView('view-register');
       }
@@ -301,6 +307,11 @@
         if (error) throw error;
         
         hideLoading();
+
+        // Update URL di address bar tanpa reload agar jika di-refresh atau di-share tetap di halaman sukses
+        const newUrl = window.location.origin + window.location.pathname + "?nama=" + encodeURIComponent(dataInsert.nama) + "&wa=" + encodeURIComponent(dataInsert.wa);
+        window.history.pushState({ path: newUrl }, '', newUrl);
+
         generateQR(dataInsert.nama, dataInsert.wa);
         switchView("view-success");
 
@@ -322,8 +333,9 @@
 
     // Tombol WA Konfirmasi
     function kirimWaKonfirmasi() {
-      const urlAplikasi = window.location.href.split('?')[0]; // URL saat ini
-      const pesan = `Halo kak 😊 Saya sudah daftar di Glow & Share Surya Cantik.\n\n👤 Nama : ${temporaryRegData.nama}\n📱 WA : ${temporaryRegData.wa}\n\nLink Aplikasi: ${urlAplikasi}`;
+      const baseUrl = window.location.origin + window.location.pathname;
+      const buktiUrl = baseUrl + "?nama=" + encodeURIComponent(temporaryRegData.nama) + "&wa=" + encodeURIComponent(temporaryRegData.wa);
+      const pesan = `Halo kak 😊 Saya sudah daftar di Glow & Share Surya Cantik.\n\n👤 Nama : ${temporaryRegData.nama}\n📱 WA : ${temporaryRegData.wa}\n\nBerikut bukti pendaftaran saya:\n\n${buktiUrl}`;
       window.open("https://wa.me/628131310110?text=" + encodeURIComponent(pesan), "_blank");
     }
   </script>
