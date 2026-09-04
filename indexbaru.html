@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Glow & Share - Warehouse Sale Surya Cantik</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- QR Code & Scanner Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --primary: #ff2d75;
+      --primary-hover: #e01b5e;
+      --primary-light: #fff0f5;
+      --purple-accent: #8a3ffc;
+      --purple-light: #f4ecff;
+      --text-dark: #2d1832;
+      --text-muted: #79617d;
+      --bg-gradient: linear-gradient(145deg, #ffd1e8 0%, #fae8ff 45%, #e0c3fc 100%);
+      --card-bg: rgba(255, 255, 255, 0.94);
+      --glass-border: rgba(255, 255, 255, 0.8);
+      --shadow-cute: 0 18px 45px rgba(233, 30, 99, 0.16), 0 4px 15px rgba(138, 63, 252, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient cute floating glow */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      opacity: 0.6;
+      pointer-events: none;
+      animation: floatBubble 8s ease-in-out infinite alternate;
+    }
+    body::before {
+      background: #ff7ebb;
+      top: -40px;
+      left: -40px;
+    }
+    body::after {
+      background: #b18cfe;
+      bottom: -40px;
+      right: -40px;
+      animation-delay: -4s;
+    }
+
+    @keyframes floatBubble {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(25px, 20px) scale(1.1); }
+    }
+
+    .view-section {
+      display: none;
+      width: 100%;
+      max-width: 500px;
+      z-index: 1;
+      animation: fadeInCute 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .active-view { display: block; }
+
+    @keyframes fadeInCute {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Card Box with Glassmorphism & Soft Glow */
+    .box {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-cute);
+      position: relative;
+    }
+
+    .header-banner {
+      background: linear-gradient(180deg, #ffeef6 0%, #fff7fb 100%);
+      padding: 18px 16px 12px 16px;
+      text-align: center;
+      position: relative;
+      border-bottom: 1px solid rgba(255, 45, 117, 0.08);
+    }
+    .header-banner img {
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      display: inline-block;
+      filter: drop-shadow(0 4px 10px rgba(255, 45, 117, 0.15));
+      transition: transform 0.3s ease;
+    }
+
+    .badge-sparkle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #ff3378, #9c27b0);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      padding: 5px 14px;
+      border-radius: 50px;
+      margin-top: 6px;
+      box-shadow: 0 4px 12px rgba(255, 45, 117, 0.3);
+    }
+
+    .content {
+      padding: 24px 22px 28px 22px;
+    }
+
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #ff2d75, #7b2cbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    label i {
+      color: var(--primary);
+      font-size: 13px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 13px 15px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid #f0d5e5;
+      background: #fffbfe;
+      font-size: 15px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-dark);
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(255, 45, 117, 0.12);
+    }
+
+    input::placeholder {
+      color: #bfaabf;
+      font-size: 14px;
+    }
+
+    .date-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1.1fr;
+      gap: 8px;
+    }
+
+    /* Buttons */
+    .btn-cute-primary {
+      width: 100%;
+      background: linear-gradient(135deg, #ff2d75 0%, #ff5293 50%, #9030ea 100%);
+      background-size: 200% auto;
+      color: #ffffff;
+      border: none;
+      padding: 15px 20px;
+      margin-top: 22px;
+      font-size: 16px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(255, 45, 117, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-cute-primary:hover {
+      background-position: right center;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(255, 45, 117, 0.45);
+    }
+
+    .btn-cute-primary:active {
+      transform: translateY(1px);
+    }
+
+    .btn-cute-secondary {
+      width: 100%;
+      background: #fff;
+      color: var(--primary);
+      border: 1.5px solid #ffccd8;
+      padding: 13px 20px;
+      margin-top: 10px;
+      font-size: 15px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-cute-secondary:hover {
+      background: #fff5f8;
+      border-color: var(--primary);
+    }
+
+    /* Success Card & Social Links */
+    .promo-pill {
+      background: linear-gradient(135deg, #fff0f6 0%, #f7edff 100%);
+      border: 1px dashed #ff8ab2;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: #9c27b0;
+      line-height: 1.5;
+      text-align: left;
+      margin: 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .promo-pill i {
+      font-size: 22px;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .qr-cute-wrapper {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 20px;
+      border: 2px solid #ffe1ed;
+      box-shadow: 0 8px 24px rgba(255, 45, 117, 0.1);
+      display: inline-block;
+      margin: 15px auto;
+    }
+
+    .follow-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid #f2e3ed;
+      padding: 11px 12px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dark);
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .social-btn:hover {
+      transform: translateY(-2px);
+      border-color: #ff85af;
+      box-shadow: 0 6px 14px rgba(255, 45, 117, 0.12);
+    }
+
+    .social-btn i {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    /* Overlays & Alerts */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 24, 50, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 20px;
+      animation: fadeInCute 0.3s ease;
+    }
+
+    .popup-box {
+      background: #ffffff;
+      padding: 26px 22px;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+      border: 2px solid #ffd5e8;
+      box-shadow: 0 20px 45px rgba(233, 30, 99, 0.25);
+    }
+
+    .popup-box .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .loading-pulse {
+      display: inline-block;
+      font-size: 32px;
+      margin-bottom: 10px;
+      animation: heartBeat 1.2s infinite ease-in-out;
+    }
+
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    /* Scanner View Custom Styles */
+    #reader {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 2px solid #ffd1e4;
+      background: #000;
+    }
+    .status-msg {
+      font-size: 15px;
+      font-weight: 700;
+      margin-top: 15px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      line-height: 1.4;
+    }
+    .status-success { background: #e8f8f0; color: #167a49; border: 1px solid #b7ebd0; }
+    .status-warning { background: #fff9ea; color: #b54708; border: 1px solid #fedf89; }
+    .status-danger { background: #fef3f2; color: #b42318; border: 1px solid #fecdca; }
+
+    @media (max-width: 400px) {
+      .follow-grid { grid-template-columns: 1fr; }
+      .content { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Global Loading Cute Modal -->
+  <div class="overlay" id="loadingOverlay">
+    <div class="popup-box">
+      <div class="loading-pulse">💖</div>
+      <div id="loadingText" style="font-family:'Outfit', sans-serif; font-size: 17px; font-weight: 700; color: var(--primary);">
+        Sedang memproses...
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">Mohon tunggu sebentar ya cantik ✨</p>
+    </div>
+  </div>
+
+  <!-- Staff Password Authentication Modal -->
+  <div class="overlay" id="staffAuthModal">
+    <div class="popup-box">
+      <div style="font-size: 32px; margin-bottom: 6px;">🔐</div>
+      <h3 style="font-family:'Outfit', sans-serif; color:var(--primary); margin-bottom: 6px; font-size: 20px;">Akses Petugas ✨</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">
+        Masukkan kata sandi khusus staf untuk membuka scanner tiket
+      </p>
+
+      <div style="text-align: left; margin-bottom: 12px;">
+        <input type="password" id="staffPassInput" placeholder="Masukkan password..." style="text-align: center; letter-spacing: 2px; font-size: 16px;" onkeydown="if(event.key==='Enter') verifikasiPasswordPetugas()">
+        <div id="staffPassError" style="display:none; color: #b42318; background: #fef3f2; border: 1px solid #fecdca; padding: 8px 12px; border-radius: 10px; font-size: 12px; margin-top: 8px; text-align: center; font-weight: 600;">
+          ❌ Password salah, coba lagi ya!
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top: 14px;">
+        <button class="btn-cute-primary" style="margin-top:0;" onclick="verifikasiPasswordPetugas()">
+          <i class="fas fa-sign-in-alt"></i> Masuk
+        </button>
+        <button class="btn-cute-secondary" style="margin-top:0;" onclick="batalAuthPetugas()">
+          Batal
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Freebies Decision Modal -->
+  <div class="overlay" id="freebiesPopup">
+    <div class="popup-box">
+      <div style="font-size: 30px; margin-bottom: 6px;">🎁</div>
+      <h3 style="font-family:'Outfit', sans-serif; color:var(--primary); margin-bottom: 8px; font-size: 19px;">Klaim Freebies</h3>
+      <p id="freebiesMessage" style="font-size: 14px; color: var(--text-dark); line-height: 1.5;"></p>
+      
+      <div class="btn-row" id="freebiesBtnRow">
+        <button class="btn-cute-primary" style="margin-top:0;" onclick="prosesFreebies(true)">
+          <i class="fas fa-check-circle"></i> Berikan
+        </button>
+        <button class="btn-cute-secondary" style="margin-top:0;" onclick="prosesFreebies(false)">
+          <i class="fas fa-times-circle"></i> Tolak
+        </button>
+      </div>
+      <button class="btn-cute-secondary" id="closeFreebiesBtn" style="display:none; margin-top: 15px;" onclick="tutupPopupDanLanjut()">
+        Tutup & Lanjut
+      </button>
+    </div>
+  </div>
+
+  <!-- VIEW: FORM PENDAFTARAN (Langsung tampil di awal) -->
+  <div id="view-register" class="view-section active-view">
+    <div class="box">
+      <div class="header-banner">
+        <img src="Logo Surcan.png" alt="Warehouse Sale Surya Cantik" onerror="this.style.display='none'">
+        <div>
+          <span class="badge-sparkle"><i class="fas fa-sparkles"></i> GLOW & SHARE</span>
+        </div>
+      </div>
+      
+      <div class="content">
+        <h2>✨ Form Pendaftaran ✨</h2>
+        
+        <form id="regForm">
+          <div class="form-group">
+            <label><i class="fas fa-user"></i> Nama Lengkap</label>
+            <input type="text" name="nama" placeholder="Ketik nama lengkapmu" required>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-venus-mars"></i> Jenis Kelamin</label>
+            <select name="jk" required>
+              <option value="">-- Pilih Jenis Kelamin --</option>
+              <option>Perempuan</option>
+              <option>Laki-laki</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-birthday-cake"></i> Tanggal Lahir</label>
+            <div class="date-grid">
+              <select id="tgl" required><option value="">Tgl</option></select>
+              <select id="bln" required><option value="">Bulan</option></select>
+              <select id="thn" required><option value="">Tahun</option></select>
+            </div>
+            <input type="hidden" name="tgl_lahir" id="tgl_lahir">
+          </div>
+
+          <div class="form-group">
+            <label><i class="fab fa-whatsapp"></i> Nomor WhatsApp</label>
+            <input type="tel" name="wa" required placeholder="Contoh: 0838777xxxxx">
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-map-marked-alt"></i> Provinsi</label>
+            <select id="provinsi" name="provinsi" required><option value="">Memuat data provinsi...</option></select>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-city"></i> Kabupaten / Kota</label>
+            <select id="kabupaten" name="kabupaten" required disabled><option value="">Pilih Provinsi terlebih dahulu</option></select>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-building"></i> Kecamatan</label>
+            <select id="kecamatan" name="kecamatan" required disabled><option value="">Pilih Kabupaten terlebih dahulu</option></select>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-home"></i> Desa / Kelurahan</label>
+            <select id="desa" name="desa" required disabled><option value="">Pilih Kecamatan terlebih dahulu</option></select>
+          </div>
+
+          <button type="submit" class="btn-cute-primary">
+            <span>DAFTAR SEKARANG</span> <i class="fas fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW: SUKSES PENDAFTARAN -->
+  <div id="view-success" class="view-section">
+    <div class="box" style="text-align: center;">
+      <div class="header-banner">
+        <img src="Logo Surcan.png" alt="Warehouse Sale Surya Cantik" onerror="this.style.display='none'">
+      </div>
+
+      <div class="content">
+        <h2>Pendaftaran Berhasil! 🎉</h2>
+        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">
+          Simpan atau <b>screenshot QR Code</b> di bawah ini dan tunjukkan kepada staff saat memasuki event.
+        </p>
+
+        <!-- QR Cute Container -->
+        <div class="qr-cute-wrapper">
+          <div id="qrcode"></div>
+        </div>
+
+        <!-- Freebies Promo Badge -->
+        <div class="promo-pill">
+          <i class="fas fa-gift"></i>
+          <div>
+            <b>Gratis Kosmetik!</b> Dapatkan hadiah cantik untuk <b>20 pengunjung pertama</b> setiap harinya.
+          </div>
+        </div>
+
+        <p style="font-size: 13px; font-weight: 700; color: var(--text-dark); text-align: left; margin-top: 15px;">
+          💖 Follow sosial media official kami:
+        </p>
+
+        <!-- Social Media Grid -->
+        <div class="follow-grid">
+          <a href="https://www.instagram.com/suryacantik.id?igsi=MWF3cGdvbjBkZHNocA==" target="_blank" class="social-btn">
+            <i class="fab fa-instagram" style="color: #E1306C;"></i>
+            <span>@suryacantik.id</span>
+          </a>
+
+          <a href="https://www.tiktok.com/@suryacantiksay?_r=1&_t=ZS-99MTICIUzMQ" target="_blank" class="social-btn">
+            <i class="fab fa-tiktok" style="color: #000000;"></i>
+            <span>@suryacantiksay</span>
+          </a>
+
+          <a href="https://whatsapp.com/channel/0029VbBZzgC9mrGhrSZtpw0C" target="_blank" class="social-btn">
+            <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+            <span>Channel WA</span>
+          </a>
+
+          <a href="https://maps.app.goo.gl/MQyJeSCnjrffz2Mo6" target="_blank" class="social-btn">
+            <i class="fas fa-map-marker-alt" style="color: #EA4335;"></i>
+            <span>Review Maps ⭐</span>
+          </a>
+        </div>
+
+        <button class="btn-cute-primary" onclick="kirimWaKonfirmasi()" style="margin-top: 24px; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);">
+          <i class="fab fa-whatsapp" style="font-size: 20px;"></i>
+          <span>Konfirmasi ke Admin</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW: SCANNER ADMIN / PETUGAS (#petugas) -->
+  <div id="view-scanner" class="view-section">
+    <div class="box">
+      <div class="header-banner">
+        <img src="Logo Surcan.png" alt="Warehouse Sale Surya Cantik" onerror="this.style.display='none'">
+        <div style="margin-top: 8px;">
+          <span class="badge-sparkle" style="background: linear-gradient(135deg, #8a3ffc, #ff2d75);">
+            <i class="fas fa-camera"></i> SCANNER PETUGAS
+          </span>
+        </div>
+      </div>
+      <div class="content">
+        <div id="reader"></div>
+
+        <div id="scanResultArea" style="display:none;">
+          <div style="background: #fff5f9; border: 1.5px solid #ffd1e4; padding: 16px; border-radius: var(--radius-md); text-align: left;">
+            <div style="font-size: 15px; margin-bottom: 6px;"><b>👤 Nama :</b> <span id="resNama" style="color:var(--primary); font-weight:700;"></span></div>
+            <div style="font-size: 15px;"><b>📱 WhatsApp :</b> <span id="resWa"></span></div>
+          </div>
+
+          <div id="statusBox" class="status-msg"></div>
+
+          <button class="btn-cute-primary" onclick="resetScanner()">
+            <i class="fas fa-qrcode"></i> Scan Customer Berikutnya
+          </button>
+        </div>
+
+        <button class="btn-cute-secondary" onclick="kembaliKeMenuDariScanner()">
+          <i class="fas fa-arrow-left"></i> Keluar Scanner
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- KONFIGURASI SUPABASE ---
+    const SUPABASE_URL = 'https://umjhmczidrzeqhubujyt.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtamhtY3ppZHJ6ZXFodWJ1anl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3MTUwNTgsImV4cCI6MjEwMjI5MTA1OH0.DUU2cPg_Rue_zY0HtQB-9R8YDBeJkuEchJfX9OR4jqo';
+    
+    // ATUR BATAS MAKSIMAL KUOTA FREEBIES PER HARI DI SINI:
+    const KUOTA_FREEBIES_HARIAN = 20;
+
+    let supabaseClient;
+    try {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch(e) {
+      console.warn("Supabase client gagal dimuat.");
+    }
+
+    let html5QrcodeScanner = null;
+    let currentScanData = { nama: "", wa: "" };
+    let temporaryRegData = { nama: "", wa: "" };
+
+    function switchView(viewId) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+      const target = document.getElementById(viewId);
+      if (target) {
+        target.classList.add('active-view');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function checkRoute() {
+      const params = new URLSearchParams(window.location.search);
+      if (window.location.hash === '#petugas') {
+        bukaScanner();
+      } else if (params.get("nama") && params.get("wa")) {
+        const nama = params.get("nama");
+        const wa = params.get("wa");
+        temporaryRegData.nama = nama;
+        temporaryRegData.wa = wa;
+        generateQR(nama, wa);
+        switchView('view-success');
+      } else {
+        switchView('view-register');
+      }
+    }
+
+    window.addEventListener('load', checkRoute);
+    window.addEventListener('hashchange', checkRoute);
+
+    function showLoading(msg) {
+      document.getElementById("loadingText").innerHTML = msg;
+      document.getElementById("loadingOverlay").style.display = "flex";
+    }
+
+    function hideLoading() {
+      document.getElementById("loadingOverlay").style.display = "none";
+    }
+  </script>
+
+  <script>
+    const form = document.getElementById("regForm");
+
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      
+      if (!supabaseClient) {
+        alert("Sistem belum terhubung ke database. Silakan periksa koneksi.");
+        return;
+      }
+
+      showLoading("Sedang mendaftarkan... ✨");
+
+      const formData = new FormData(form);
+      const dataInsert = {
+        nama: formData.get("nama"),
+        jk: formData.get("jk"),
+        tgl_lahir: formData.get("tgl_lahir"),
+        wa: formData.get("wa"),
+        provinsi: formData.get("provinsi"),
+        kabupaten: formData.get("kabupaten"),
+        kecamatan: formData.get("kecamatan"),
+        desa: formData.get("desa")
+      };
+
+      temporaryRegData.nama = dataInsert.nama;
+      temporaryRegData.wa = dataInsert.wa;
+
+      try {
+        const { error } = await supabaseClient.from('registrations-G&S SURCAN').insert([dataInsert]);
+        if (error) throw error;
+        
+        hideLoading();
+
+        const newUrl = window.location.origin + window.location.pathname + "?nama=" + encodeURIComponent(dataInsert.nama) + "&wa=" + encodeURIComponent(dataInsert.wa);
+        window.history.pushState({ path: newUrl }, '', newUrl);
+
+        generateQR(dataInsert.nama, dataInsert.wa);
+        switchView("view-success");
+
+      } catch (err) {
+        hideLoading();
+        alert("Gagal mengirim data. Pastikan koneksi internet Anda stabil.\n" + err.message);
+        console.error(err);
+      }
+    });
+
+    function generateQR(nama, wa) {
+      const qrEl = document.getElementById("qrcode");
+      qrEl.innerHTML = "";
+      const qrText = nama + "|" + wa;
+      new QRCode(qrEl, {
+        text: qrText,
+        width: 175,
+        height: 175,
+        colorDark : "#2d1832",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+    }
+
+    function kirimWaKonfirmasi() {
+      const baseUrl = window.location.origin + window.location.pathname;
+      const buktiUrl = baseUrl + "?nama=" + encodeURIComponent(temporaryRegData.nama) + "&wa=" + encodeURIComponent(temporaryRegData.wa);
+      const pesan = `Halo kak 😊 Saya sudah daftar di Glow & Share Surya Cantik.\n\n👤 Nama : ${temporaryRegData.nama}\n📱 WA : ${temporaryRegData.wa}\n\nBerikut bukti pendaftaran saya:\n\n${buktiUrl}`;
+      window.open("https://wa.me/6285117764040?text=" + encodeURIComponent(pesan), "_blank");
+    }
+  </script>
+
+  <script>
+    const provEl = document.getElementById("provinsi");
+    const kabEl = document.getElementById("kabupaten");
+    const kecEl = document.getElementById("kecamatan");
+    const desaEl = document.getElementById("desa");
+    const API = "https://www.emsifa.com/api-wilayah-indonesia/api";
+
+    async function loadProvinsi() {
+      try {
+        const res = await fetch(`${API}/provinces.json`);
+        const data = await res.json();
+        provEl.innerHTML = '<option value="">-- Pilih Provinsi --</option>';
+        data.forEach(item => {
+          provEl.innerHTML += `<option value="${item.name}" data-id="${item.id}">${item.name}</option>`;
+        });
+      } catch(e) {
+        provEl.innerHTML = '<option value="">Gagal memuat wilayah</option>';
+      }
+    }
+
+    provEl.addEventListener("change", async ()=>{
+      kabEl.disabled = false; kecEl.disabled = true; desaEl.disabled = true;
+      const id = provEl.selectedOptions[0].dataset.id;
+      if(!id) return;
+      const res = await fetch(`${API}/regencies/${id}.json`);
+      const data = await res.json();
+      kabEl.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>';
+      data.forEach(item => { kabEl.innerHTML += `<option value="${item.name}" data-id="${item.id}">${item.name}</option>`; });
+    });
+
+    kabEl.addEventListener("change", async ()=>{
+      kecEl.disabled = false; desaEl.disabled = true;
+      const id = kabEl.selectedOptions[0].dataset.id;
+      if(!id) return;
+      const res = await fetch(`${API}/districts/${id}.json`);
+      const data = await res.json();
+      kecEl.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+      data.forEach(item => { kecEl.innerHTML += `<option value="${item.name}" data-id="${item.id}">${item.name}</option>`; });
+    });
+
+    kecEl.addEventListener("change", async ()=>{
+      desaEl.disabled = false;
+      const id = kecEl.selectedOptions[0].dataset.id;
+      if(!id) return;
+      const res = await fetch(`${API}/villages/${id}.json`);
+      const data = await res.json();
+      desaEl.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
+      data.forEach(item => { desaEl.innerHTML += `<option value="${item.name}">${item.name}</option>`; });
+    });
+
+    // Inisialisasi Pilihan Tanggal
+    const tgl = document.getElementById("tgl");
+    const bln = document.getElementById("bln");
+    const thn = document.getElementById("thn");
+    const tglLahir = document.getElementById("tgl_lahir");
+
+    for(let i=1; i<=31; i++) tgl.innerHTML += `<option value="${i}">${i}</option>`;
+    const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    bulan.forEach((b,i) => bln.innerHTML += `<option value="${String(i+1).padStart(2,"0")}">${b}</option>`);
+    for(let i=new Date().getFullYear(); i>=1950; i--) thn.innerHTML += `<option value="${i}">${i}</option>`;
+
+    function updateTanggal(){
+      if(tgl.value && bln.value && thn.value) {
+        tglLahir.value = `${thn.value}-${bln.value}-${String(tgl.value).padStart(2,"0")}`;
+      }
+    }
+    tgl.addEventListener("change", updateTanggal);
+    bln.addEventListener("change", updateTanggal);
+    thn.addEventListener("change", updateTanggal);
+
+    loadProvinsi();
+  </script>
+
+  <script>
+    function bukaScanner() {
+      const authModal = document.getElementById("staffAuthModal");
+      const passInput = document.getElementById("staffPassInput");
+      const errBox = document.getElementById("staffPassError");
+      
+      errBox.style.display = "none";
+      passInput.value = "";
+      authModal.style.display = "flex";
+      setTimeout(() => passInput.focus(), 200);
+    }
+
+    function verifikasiPasswordPetugas() {
+      const passInput = document.getElementById("staffPassInput");
+      const errBox = document.getElementById("staffPassError");
+      
+      if (passInput.value === "surcan2025") {
+        document.getElementById("staffAuthModal").style.display = "none";
+        switchView('view-scanner');
+        initScanner();
+      } else {
+        errBox.style.display = "block";
+        passInput.value = "";
+        passInput.focus();
+      }
+    }
+
+    function batalAuthPetugas() {
+      document.getElementById("staffAuthModal").style.display = "none";
+      window.location.hash = '';
+      switchView('view-register');
+    }
+
+    function kembaliKeMenuDariScanner() {
+      if(html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+          window.location.hash = '';
+        }).catch(() => {
+          window.location.hash = '';
+        });
+      } else {
+        window.location.hash = '';
+      }
+    }
+
+    function initScanner() {
+      document.getElementById('reader').style.display = 'block';
+      document.getElementById('scanResultArea').style.display = 'none';
+
+      html5QrcodeScanner = new Html5Qrcode("reader");
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 240 },
+        async (decodedText) => {
+          html5QrcodeScanner.pause(true);
+          try { new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg").play(); } catch(e){}
+
+          let nama = "", wa = "";
+          if (decodedText.includes("|")) {
+            const parts = decodedText.split("|");
+            nama = parts[0].trim(); wa = parts[1].trim();
+          } else {
+            const parts = decodedText.trim().split(/\s+/);
+            wa = parts.pop(); nama = parts.join(" ");
+          }
+
+          currentScanData = { nama, wa };
+          await prosesScanMasukDanFreebies(nama, wa);
+        }
+      ).catch(err => {
+        console.warn("Gagal akses kamera", err);
+        alert("Izinkan akses kamera untuk memindai QR Code.");
+      });
+    }
+
+    function resetScanner() {
+      document.getElementById('scanResultArea').style.display = 'none';
+      document.getElementById('reader').style.display = 'block';
+      if(html5QrcodeScanner) html5QrcodeScanner.resume();
+    }
+
+    async function prosesScanMasukDanFreebies(nama, wa) {
+      if (!supabaseClient) { alert("Koneksi Supabase belum terpasang!"); return; }
+
+      document.getElementById('reader').style.display = 'none';
+      document.getElementById('scanResultArea').style.display = 'block';
+      document.getElementById('resNama').innerText = nama;
+      document.getElementById('resWa').innerText = wa;
+
+      const statBox = document.getElementById('statusBox');
+      statBox.className = "status-msg";
+      statBox.innerText = "⏳ Sedang mencatat kehadiran...";
+
+      try {
+        // 1. Catat Kehadiran
+        await supabaseClient.from('scans-G&S SURCAN').insert([{ nama: nama, wa: wa, tipe: 'hadir' }]);
+
+        statBox.className = "status-msg status-success";
+        statBox.innerHTML = "✅ Kehadiran Dicatat<br><small style='font-size:12px; font-weight:normal;'>Mengecek kuota freebies hari ini...</small>";
+
+        // 2. Cek Kuota Freebies Hari Ini
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const todayStr = today.toISOString();
+
+        const { count: freebiesCount, error: countErr } = await supabaseClient.from('scans-G&S SURCAN')
+          .select('*', { count: 'exact', head: true })
+          .eq('tipe', 'freebie')
+          .gte('created_at', todayStr);
+
+        if (countErr) throw countErr;
+
+        if (freebiesCount >= KUOTA_FREEBIES_HARIAN) {
+          tampilkanStatusAkhir("warning", `⚠️ <b>Kuota Freebies Hari Ini Habis (${freebiesCount}/${KUOTA_FREEBIES_HARIAN}).</b><br>Hanya kehadiran yang dicatat.`);
+          return;
+        }
+
+        // 3. Cek apakah customer sudah pernah klaim freebie
+        const { data: cekKlaim, error: cekErr } = await supabaseClient.from('scans-G&S SURCAN')
+          .select('*')
+          .eq('tipe', 'freebie')
+          .eq('wa', wa)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (cekErr) throw cekErr;
+
+        if (cekKlaim && cekKlaim.length > 0) {
+          // Format tanggal klaim sebelumnya
+          let tglKlaimStr = "";
+          try {
+            const dateObj = new Date(cekKlaim[0].created_at);
+            tglKlaimStr = dateObj.toLocaleString("id-ID", {
+              timeZone: "Asia/Jakarta",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit"
+            }).replace(".", ":") + " WIB";
+          } catch(e) {
+            tglKlaimStr = "sebelumnya";
+          }
+
+          tampilkanStatusAkhir("warning", `⚠️ <b>Sudah Pernah Klaim Freebies!</b><br><span style="font-size:13px; font-weight:normal;">Customer ini tercatat sudah mengambil freebie pada:</span><br><b>📅 ${tglKlaimStr}</b><br><small style="font-size:12px; color:#b54708;">(Hanya status kehadiran baru yang dicatat)</small>`);
+          return;
+        }
+
+        // 4. Pop up konfirmasi syarat follow sosmed
+        const sisa = KUOTA_FREEBIES_HARIAN - freebiesCount;
+        tampilkanPopupFreebies(`Sisa kuota freebies hari ini: <b>${sisa}</b> pcs.<br><br>Apakah <b>${nama}</b> sudah menunjukkan bukti follow sosmed & berhak menerima Freebies?`);
+
+      } catch (err) {
+        console.error(err);
+        tampilkanStatusAkhir("danger", "❌ Terjadi kendala saat menghubungi database.");
+      }
+    }
+
+    function tampilkanStatusAkhir(tipe, pesan) {
+      const statBox = document.getElementById('statusBox');
+      statBox.className = `status-msg status-${tipe}`;
+      statBox.innerHTML = pesan;
+    }
+
+    function tampilkanPopupFreebies(msg) {
+      document.getElementById("freebiesMessage").innerHTML = msg;
+      document.getElementById("freebiesBtnRow").style.display = "flex";
+      document.getElementById("closeFreebiesBtn").style.display = "none";
+      document.getElementById("freebiesPopup").style.display = "flex";
+    }
+
+    async function prosesFreebies(disetujui) {
+      if(!disetujui) {
+        document.getElementById("freebiesPopup").style.display = "none";
+        tampilkanStatusAkhir("danger", "❌ Freebies TIDAK diberikan (syarat follow sosmed belum dipenuhi).");
+        return;
+      }
+
+      document.getElementById("freebiesBtnRow").style.display = "none";
+      document.getElementById("freebiesMessage").innerHTML = "⏳ Sedang mencatat freebie ke database...";
+
+      try {
+        await supabaseClient.from('scans-G&S SURCAN').insert([{ 
+          nama: currentScanData.nama, 
+          wa: currentScanData.wa, 
+          tipe: 'freebie' 
+        }]);
+
+        document.getElementById("freebiesMessage").innerHTML = "🎉 <b>FREEBIES BERHASIL DICATAT & DIBERIKAN!</b>";
+        tampilkanStatusAkhir("success", "✅ Kehadiran & Klaim Freebies Sukses Dicatat! 🎁");
+      } catch (err) {
+        document.getElementById("freebiesMessage").innerHTML = "❌ Gagal menyimpan data freebies.";
+        tampilkanStatusAkhir("danger", "❌ Kehadiran tercatat, namun Freebies gagal disimpan.");
+      }
+
+      document.getElementById("closeFreebiesBtn").style.display = "block";
+    }
+
+    function tutupPopupDanLanjut() {
+      document.getElementById("freebiesPopup").style.display = "none";
+    }
+  </script>
+</body>
+</html>
