@@ -935,7 +935,7 @@
 
         const { count: freebiesCount, error: countErr } = await supabaseClient.from('scans-G&S SURCAN')
           .select('*', { count: 'exact', head: true })
-          .eq('tipe', 'freebie')
+          .eq('tipe', 'freebies')
           .gte('created_at', todayStr);
 
         if (countErr) throw countErr;
@@ -945,10 +945,10 @@
           return;
         }
 
-        // 3. Cek apakah customer sudah pernah klaim freebie
+        // 3. Cek apakah customer sudah pernah klaim freebies
         const { data: cekKlaim, error: cekErr } = await supabaseClient.from('scans-G&S SURCAN')
           .select('*')
-          .eq('tipe', 'freebie')
+          .eq('tipe', 'freebies')
           .eq('wa', wa)
           .order('created_at', { ascending: false })
           .limit(1);
@@ -1007,13 +1007,13 @@
       }
 
       document.getElementById("freebiesBtnRow").style.display = "none";
-      document.getElementById("freebiesMessage").innerHTML = "⏳ Sedang mencatat freebie ke database...";
+      document.getElementById("freebiesMessage").innerHTML = "⏳ Sedang mencatat freebies ke database...";
 
       try {
         await supabaseClient.from('scans-G&S SURCAN').insert([{ 
           nama: currentScanData.nama, 
           wa: currentScanData.wa, 
-          tipe: 'freebie' 
+          tipe: 'freebies' 
         }]);
 
         document.getElementById("freebiesMessage").innerHTML = "🎉 <b>FREEBIES BERHASIL DICATAT & DIBERIKAN!</b>";
